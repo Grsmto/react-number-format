@@ -1,5 +1,7 @@
 //@flow
 
+import BigNumber from 'bignumber.js';
+
 // basic noop function
 export function noop(){}
 export function returnTrue(){ return true; }
@@ -81,8 +83,11 @@ export function roundToPrecision(numStr: string, scale: number, fixedDecimalScal
   if (['', '-'].indexOf(numStr) !== -1) return numStr;
 
   const shoudHaveDecimalSeparator = numStr.indexOf('.') !== -1 && scale;
-  const {beforeDecimal, afterDecimal, hasNagation} = splitDecimal(numStr);
-  const roundedDecimalParts = parseFloat(`0.${afterDecimal || '0'}`).toFixed(scale).split('.');
+
+  const { beforeDecimal, afterDecimal, hasNagation } = splitDecimal(numStr);
+
+  const roundedDecimalParts = new BigNumber(`0.${afterDecimal || '0'}`).decimalPlaces(scale, BigNumber.ROUND_FLOOR).toString().split('.');
+
   const intPart = beforeDecimal.split('').reverse().reduce((roundedStr, current, idx) => {
     if (roundedStr.length > idx) {
       return (Number(roundedStr[0]) + Number(current)).toString() + roundedStr.substring(1, roundedStr.length);
